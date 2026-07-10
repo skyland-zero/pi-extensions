@@ -1,5 +1,5 @@
 {
-	"name": "@narumitw/pi-plan-oc",
+	"name": "@skylandzero/pi-plan-oc",
 	"version": "0.12.0",
 	"description": "Pi extension that adds an OpenCode-style read-only /plan collaboration mode with subagent integration and plan file output.",
 	"type": "module",

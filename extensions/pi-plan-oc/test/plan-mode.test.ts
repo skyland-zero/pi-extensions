@@ -16,13 +16,12 @@ const PLAN_COMMAND_COMPLETIONS = [
 	{ value: "plan", label: "plan", description: "Show current plan file" },
 ];
 
-test("plan-mode-oc registers flag, question tool, command, and safety hooks", () => {
+test("plan-mode-oc registers flag, command, and safety hooks", () => {
 	const mock = createMockPi({ activeTools: ["read", "bash"] });
 	planModeOC(mock.pi);
 
 	assert.ok(mock.flags.has("plan"));
 	assert.equal(mock.flags.get("plan")?.type, "boolean");
-	assert.ok(mock.tools.some((t) => t.name === "plan_mode_question"));
 	assert.ok(mock.commands.has("plan"));
 	assert.ok(mock.events.has("tool_call"));
 	assert.ok(mock.events.has("before_agent_start"));
@@ -71,12 +70,7 @@ test("isSafeCommand permits read-only and blocks mutating commands", () => {
 	assert.equal(isSafeCommand("cat > file"), false);
 });
 
-test("withoutQuestionTool removes plan_mode_question", () => {
-	assert.deepEqual(withoutQuestionTool(["read", "bash", "plan_mode_question", "subagent"]), [
-		"read",
-		"bash",
-		"subagent",
-	]);
+test("withoutQuestionTool is a passthrough after plan_mode_question removal", () => {
 	assert.deepEqual(withoutQuestionTool(["read", "bash"]), ["read", "bash"]);
 });
 

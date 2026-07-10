@@ -15,7 +15,6 @@ import {
 const STATE_ENTRY_TYPE = "plan-oc-state";
 const STATUS_KEY = "plan-oc";
 const PLAN_WIDGET_KEY = "plan-oc-widget";
-const PLAN_MODE_QUESTION_TOOL_NAME = "plan_mode_question";
 const SUBAGENT_TOOL_NAME = "subagent";
 
 const SAFE_BUILTIN_PLAN_TOOLS = new Set(["read", "bash", "grep", "find", "ls"]);
@@ -87,24 +86,6 @@ export interface CommandArgumentCompletion {
 	description?: string;
 }
 
-interface PlanModeQuestion {
-	id: string;
-	header: string;
-	question: string;
-	options: PlanModeQuestionOption[];
-}
-
-interface PlanModeQuestionOption {
-	label: string;
-	description?: string;
-}
-
-type PlanModeQuestionReason =
-	| "cancelled"
-	| "ui_unavailable"
-	| "plan_mode_inactive"
-	| "invalid_input";
-
 type SessionEntry = {
 	type?: string;
 	customType?: string;
@@ -123,90 +104,6 @@ export default function planModeOC(pi: ExtensionAPI) {
 		description: "Start in OpenCode-style Plan mode",
 		type: "boolean",
 		default: false,
-	});
-
-	// ── Plan Mode Question Tool ───────────────────────────────────────────
-	const QUESTION_PARAMS = {
-		type: "object",
-		additionalProperties: false,
-		required: ["questions"],
-		properties: {
-			questions: {
-				type: "array",
-				minItems: 1,
-				maxItems: 3,
-				description: "Questions to show the user. Prefer 1 and do not exceed 3.",
-				items: {
-					type: "object",
-					additionalProperties: false,
-					required: ["id", "header", "question", "options"],
-					properties: {
-						id: { type: "string", description: "Stable identifier (snake_case)." },
-						header: { type: "string", description: "Short header label (12 or fewer chars)." },
-						question: { type: "string", description: "Single-sentence prompt." },
-						options: {
-							type: "array",
-							minItems: 2,
-							maxItems: 4,
-							description: "2-4 mutually exclusive choices.",
-							items: {
-								type: "object",
-								additionalProperties: false,
-								required: ["label", "description"],
-								properties: {
-									label: { type: "string", description: "User-facing label (1-5 words)." },
-									description: {
-										type: "string",
-										description: "One short sentence explaining impact.",
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	} as const;
-
-	pi.registerTool({
-		name: PLAN_MODE_QUESTION_TOOL_NAME,
-		label: "Plan question",
-		description:
-			"Ask the user one to three Plan-mode clarification questions with meaningful options, then wait for the answer. Only available while Plan mode is active.",
-		promptSnippet: "Ask user decision questions while Plan mode is active",
-		promptGuidelines: [
-			"In Plan mode, use plan_mode_question for important preferences, tradeoffs, or assumptions that cannot be discovered from read-only exploration.",
-		],
-		parameters: QUESTION_PARAMS,
-		async execute(_toolCallId, params: unknown, _signal, _onUpdate, ctx) {
-			if (!state.enabled) {
-				return questionCancelled(
-					[],
-					"plan_mode_inactive",
-					"plan_mode_question is only available while Plan mode is active.",
-				);
-			}
-
-			const parsed = normalizeQuestions(params);
-			if (!parsed.ok) {
-				return questionCancelled([], "invalid_input", `Error: ${parsed.error}`);
-			}
-
-			if (!ctx.hasUI) {
-				return questionCancelled(
-					parsed.questions,
-					"ui_unavailable",
-					"Interactive UI is not available.",
-				);
-			}
-
-			const answers = await askQuestions(parsed.questions, ctx);
-			if (!answers) {
-				return questionCancelled(parsed.questions, "cancelled", "User cancelled.");
-			}
-
-			return questionAnswered(parsed.questions, answers);
-		},
 	});
 
 	// ── Shortcut: Alt+Q ──────────────────────────────────────────────────
@@ -304,8 +201,6 @@ export default function planModeOC(pi: ExtensionAPI) {
 			enterPlanMode(ctx);
 		} else if (state.enabled) {
 			activatePlanModeTools(ctx);
-		} else {
-			deactivateQuestionTool();
 		}
 
 		updateUi(ctx);
@@ -385,7 +280,7 @@ export default function planModeOC(pi: ExtensionAPI) {
 
 	function enterPlanMode(ctx: ExtensionContext) {
 		if (!state.enabled) {
-			previousTools = withoutQuestionTool(getActiveToolsSafe(pi));
+			previousTools = [...getActiveToolsSafe(pi)];
 		}
 		state = { ...state, enabled: true };
 
@@ -416,16 +311,8 @@ export default function planModeOC(pi: ExtensionAPI) {
 
 	function restoreTools() {
 		const restored = previousTools && previousTools.length > 0 ? previousTools : DEFAULT_TOOLS;
-		pi.setActiveTools(withoutQuestionTool(restored));
+		pi.setActiveTools(restored);
 		previousTools = undefined;
-	}
-
-	function deactivateQuestionTool() {
-		const active = getActiveToolsSafe(pi);
-		const filtered = withoutQuestionTool(active);
-		if (filtered.length !== active.length) {
-			pi.setActiveTools(filtered);
-		}
 	}
 
 	function persistState() {
@@ -654,7 +541,7 @@ export function isSafeCommand(command: string): boolean {
 }
 
 export function withoutQuestionTool(names: string[]): string[] {
-	return names.filter((n) => n !== PLAN_MODE_QUESTION_TOOL_NAME);
+	return names;
 }
 
 export function readCommand(input: unknown): string {
@@ -664,14 +551,14 @@ export function readCommand(input: unknown): string {
 
 export function planModeToolNames(state: PlanModeState, pi: ExtensionAPI): string[] {
 	const tools = getAllToolsSafe(pi);
-	if (tools.length === 0) return ["read", "bash", PLAN_MODE_QUESTION_TOOL_NAME];
+	if (tools.length === 0) return ["read", "bash"];
 
 	const selected = planModeSelectedNames(state, tools, pi);
 	const base = tools
 		.filter((t) => selected.has(t.name) && canSelectToolInPlanMode(t))
 		.map((t) => t.name);
 
-	const required = [PLAN_MODE_QUESTION_TOOL_NAME];
+	const required: string[] = [];
 	const hasSubagent = tools.some((t) => t.name === SUBAGENT_TOOL_NAME);
 	if (hasSubagent && !selected.has(SUBAGENT_TOOL_NAME)) {
 		required.push(SUBAGENT_TOOL_NAME);
@@ -698,7 +585,6 @@ function defaultPlanModeNames(tools: ToolInfo[]): Set<string> {
 			.filter(
 				(t) =>
 					(isBuiltinTool(t) && SAFE_BUILTIN_PLAN_TOOLS.has(t.name)) ||
-					t.name === PLAN_MODE_QUESTION_TOOL_NAME ||
 					t.name === SUBAGENT_TOOL_NAME,
 			)
 			.map((t) => t.name),
@@ -768,7 +654,7 @@ ${
    - Provide each agent with a specific search focus`
 		: "2. Use read/grep/find/ls to explore the codebase"
 }
-3. After exploring, ask clarifying questions using plan_mode_question if needed
+3. After exploring, ask clarifying questions if needed
 
 ### Phase 2: Design
 Goal: Design an implementation approach.
@@ -784,7 +670,7 @@ ${
 ### Phase 3: Review
 Goal: Review the design and ensure alignment with the user's intentions.
 1. Read critical files identified during exploration
-2. Use plan_mode_question to clarify remaining questions
+2. Ask clarifying questions if needed
 3. Do NOT make large assumptions about user intent
 
 ### Phase 4: Final Plan
@@ -797,7 +683,7 @@ Goal: Write your final plan to the plan file at \`${planPath}\`.
 Once the plan file is complete, summarize what you've planned.
 The user will read the plan file and exit Plan mode manually to begin implementation.
 
-**Important:** Use plan_mode_question to clarify requirements. Do NOT ask "Is this plan okay?".
+**Important:** Ask clarifying questions if needed. Do NOT ask "Is this plan okay?".
 If you need more clarification, ask. If the plan is ready, just finish writing it.`;
 }
 
@@ -868,124 +754,4 @@ function unique(values: string[]): string[] {
 	return Array.from(new Set(values));
 }
 
-// ─── Question helpers ───────────────────────────────────────────────────────
 
-function normalizeQuestions(
-	input: unknown,
-): { ok: true; questions: PlanModeQuestion[] } | { ok: false; error: string } {
-	if (!isRecord(input) || !Array.isArray(input.questions)) {
-		return { ok: false, error: "questions must be an array" };
-	}
-	if (input.questions.length < 1 || input.questions.length > 3) {
-		return { ok: false, error: "questions must contain 1-3 items" };
-	}
-
-	const questions: PlanModeQuestion[] = [];
-	for (const [qi, raw] of input.questions.entries()) {
-		if (!isRecord(raw)) return { ok: false, error: `question ${qi + 1} must be an object` };
-		const id = strField(raw.id);
-		const header = strField(raw.header);
-		const question = strField(raw.question);
-		if (!id || !header || !question) {
-			return { ok: false, error: `question ${qi + 1} requires non-empty id, header, question` };
-		}
-		if (!Array.isArray(raw.options) || raw.options.length < 2 || raw.options.length > 4) {
-			return { ok: false, error: `question ${qi + 1} options must contain 2-4 items` };
-		}
-
-		const options: PlanModeQuestionOption[] = [];
-		for (const [oi, ro] of raw.options.entries()) {
-			if (!isRecord(ro))
-				return { ok: false, error: `question ${qi + 1} option ${oi + 1} must be an object` };
-			const label = strField(ro.label);
-			const desc = strField(ro.description);
-			if (!label || !desc)
-				return {
-					ok: false,
-					error: `question ${qi + 1} option ${oi + 1} requires label and description`,
-				};
-			options.push({ label, description: desc });
-		}
-		questions.push({ id, header, question, options });
-	}
-	return { ok: true, questions };
-}
-
-async function askQuestions(
-	questions: PlanModeQuestion[],
-	ctx: ExtensionContext,
-): Promise<
-	| Array<{ id: string; header: string; question: string; answer: string; wasCustom: boolean }>
-	| undefined
-> {
-	const answers: Array<{
-		id: string;
-		header: string;
-		question: string;
-		answer: string;
-		wasCustom: boolean;
-	}> = [];
-	for (const q of questions) {
-		const choices = q.options.map((o, i) => `${i + 1}. ${o.label} — ${o.description}`);
-		const other = `${q.options.length + 1}. Other (free-form)`;
-		const choice = await ctx.ui.select(`${q.header}: ${q.question}`, [...choices, other]);
-		if (!choice) return undefined;
-
-		if (choice === other) {
-			const custom = (await ctx.ui.editor(q.question, ""))?.trim();
-			if (!custom) return undefined;
-			answers.push({
-				id: q.id,
-				header: q.header,
-				question: q.question,
-				answer: custom,
-				wasCustom: true,
-			});
-		} else {
-			const idx = choices.indexOf(choice);
-			const opt = q.options[idx];
-			if (!opt) return undefined;
-			answers.push({
-				id: q.id,
-				header: q.header,
-				question: q.question,
-				answer: opt.label,
-				wasCustom: false,
-			});
-		}
-	}
-	return answers;
-}
-
-function questionAnswered(questions: PlanModeQuestion[], answers: unknown) {
-	return {
-		content: [
-			{ type: "text" as const, text: JSON.stringify({ cancelled: false, answers }, null, 2) },
-		],
-		details: { cancelled: false, questions, answers },
-	};
-}
-
-function questionCancelled(
-	questions: PlanModeQuestion[],
-	reason: PlanModeQuestionReason,
-	message: string,
-) {
-	return {
-		content: [
-			{
-				type: "text" as const,
-				text: JSON.stringify({ cancelled: true, reason, message }, null, 2),
-			},
-		],
-		details: { cancelled: true, reason, questions },
-	};
-}
-
-function isRecord(v: unknown): v is Record<string, unknown> {
-	return typeof v === "object" && v !== null;
-}
-
-function strField(v: unknown): string | undefined {
-	return typeof v === "string" ? v.trim() : undefined;
-}

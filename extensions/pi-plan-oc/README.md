@@ -1,8 +1,8 @@
 # 🧭 pi-plan-oc — OpenCode-style Plan Mode for Pi
 
-[![npm](https://img.shields.io/npm/v/@narumitw/pi-plan-oc)](https://www.npmjs.com/package/@narumitw/pi-plan-oc) [![Pi extension](https://img.shields.io/badge/Pi-extension-blue)](https://pi.dev) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
+[![npm](https://img.shields.io/npm/v/@skylandzero/pi-plan-oc)](https://www.npmjs.com/package/@skylandzero/pi-plan-oc) [![Pi extension](https://img.shields.io/badge/Pi-extension-blue)](https://pi.dev) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
 
-`@narumitw/pi-plan-oc` adds an OpenCode-style `/plan` collaboration mode to Pi. Plan mode is for read-only exploration, subagent-assisted codebase reconnaissance, clarifying questions, and writing an implementation plan to a `.md` file — without mutating any project files.
+`@skylandzero/pi-plan-oc` adds an OpenCode-style `/plan` collaboration mode to Pi. Plan mode is for read-only exploration, subagent-assisted codebase reconnaissance, clarifying questions, and writing an implementation plan to a `.md` file — without mutating any project files.
 
 ## Features
 
@@ -20,10 +20,10 @@
 
 ```bash
 # Install plan mode
-pi install npm:@narumitw/pi-plan-oc
+pi install npm:@skylandzero/pi-plan-oc
 
 # Recommended: also install subagents for parallel exploration
-pi install npm:@narumitw/pi-subagents
+pi install npm:@skylandzero/pi-subagents
 ```
 
 Try without installing:
@@ -54,7 +54,7 @@ The plan file is written to `~/.pi/plans/<session-name>.md`. Exit Plan mode manu
 ## Requirements
 
 - Pi 0.80+
-- Optional but recommended: `@narumitw/pi-subagents` for subagent-based exploration
+- Optional but recommended: `@skylandzero/pi-subagents` for subagent-based exploration
 
 ## License
 

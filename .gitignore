@@ -205,3 +205,6 @@ src/
 src.zip
 third_party/
 extensions/archived/
+
+# Runtime
+.pi-subagents/

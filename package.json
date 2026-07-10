@@ -27,7 +27,7 @@
 		"pack:goal": "npm --workspace @narumitw/pi-goal pack --dry-run",
 		"pack:lsp": "npm --workspace @narumitw/pi-lsp pack --dry-run",
 		"pack:plan-mode": "npm --workspace @narumitw/pi-plan-mode pack --dry-run",
-		"pack:plan-oc": "npm --workspace @narumitw/pi-plan-oc pack --dry-run",
+		"pack:plan-oc": "npm --workspace @skylandzero/pi-plan-oc pack --dry-run",
 		"pack:retry": "npm --workspace @narumitw/pi-retry pack --dry-run",
 		"pack:statusline": "npm --workspace @narumitw/pi-statusline pack --dry-run",
 		"pack:sync": "npm --workspace @narumitw/pi-sync pack --dry-run",
