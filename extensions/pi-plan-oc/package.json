@@ -1,0 +1,42 @@
+{
+	"name": "@narumitw/pi-plan-oc",
+	"version": "0.12.0",
+	"description": "Pi extension that adds an OpenCode-style read-only /plan collaboration mode with subagent integration and plan file output.",
+	"type": "module",
+	"license": "MIT",
+	"private": false,
+	"keywords": [
+		"pi-package",
+		"pi-extension",
+		"pi",
+		"plan-mode",
+		"planning",
+		"opencode"
+	],
+	"files": [
+		"src",
+		"README.md",
+		"LICENSE"
+	],
+	"pi": {
+		"extensions": [
+			"./src/plan-mode.ts"
+		]
+	},
+	"scripts": {
+		"check": "biome check . && npm run typecheck",
+		"format": "biome check --write .",
+		"typecheck": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.5.2",
+		"@earendil-works/pi-coding-agent": "0.80.3",
+		"@earendil-works/pi-tui": "0.80.3",
+		"typescript": "6.0.3"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/narumiruna/pi-extensions",
+		"directory": "extensions/pi-plan-oc"
+	}
+}

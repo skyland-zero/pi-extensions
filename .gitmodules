@@ -1,0 +1,3 @@
+[submodule "extensions/pi-spark"]
+	path = extensions/pi-spark
+	url = https://github.com/skyland-zero/pi-spark.git

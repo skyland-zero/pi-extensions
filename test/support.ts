@@ -23,6 +23,7 @@ type MockPiApi = {
 	registerCommand(name: string, command: unknown): void;
 	registerFlag(name: string, flag: unknown): void;
 	registerTool(tool: unknown): void;
+	registerShortcut(shortcut: string, options: unknown): void;
 	on(name: string, handler: MockHandler): void;
 	getFlag(name: string): unknown;
 	getActiveTools(): string[];
@@ -56,6 +57,9 @@ export function createMockPi(options: { activeTools?: string[]; allTools?: unkno
 		},
 		registerTool(tool: unknown) {
 			tools.push(tool as MockTool);
+		},
+		registerShortcut(_shortcut: string, _options: unknown) {
+			// no-op in tests
 		},
 		on(name: string, handler: MockHandler) {
 			events.set(name, [...(events.get(name) ?? []), handler]);

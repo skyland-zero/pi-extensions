@@ -103,6 +103,9 @@ pack-lsp:
 pack-plan-mode:
     just pack plan-mode
 
+pack-plan-oc:
+    just pack plan-oc
+
 pack-retry:
     just pack retry
 
@@ -151,6 +154,9 @@ try-lsp:
 
 try-plan-mode:
     just try plan-mode
+
+try-plan-oc:
+    just try plan-oc
 
 try-retry:
     just try retry
@@ -201,6 +207,9 @@ install-lsp:
 install-plan-mode:
     just install plan-mode
 
+install-plan-oc:
+    just install plan-oc
+
 install-retry:
     just install retry
 
@@ -249,6 +258,9 @@ publish-lsp:
 
 publish-plan-mode:
     just publish plan-mode
+
+publish-plan-oc:
+    just publish plan-oc
 
 publish-retry:
     just publish retry
