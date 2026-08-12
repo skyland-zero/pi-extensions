@@ -1,0 +1,42 @@
+{
+	"name": "@narumitw/pi-opencode-go-usage",
+	"version": "0.12.0",
+	"description": "Pi extension that shows OpenCode Go subscription usage via /usage using the key stored by `opencode auth login`, without polluting the LLM context.",
+	"type": "module",
+	"license": "MIT",
+	"private": false,
+	"keywords": [
+		"pi-package",
+		"pi-extension",
+		"pi",
+		"opencode",
+		"usage",
+		"status"
+	],
+	"files": [
+		"src",
+		"README.md",
+		"LICENSE"
+	],
+	"pi": {
+		"extensions": [
+			"./src/usage.ts"
+		]
+	},
+	"scripts": {
+		"check": "biome check . && npm run typecheck",
+		"format": "biome check --write .",
+		"typecheck": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.5.2",
+		"@earendil-works/pi-coding-agent": "0.84.1",
+		"@types/node": "26.1.0",
+		"typescript": "6.0.3"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/narumiruna/pi-extensions",
+		"directory": "extensions/pi-opencode-go-usage"
+	}
+}

@@ -100,6 +100,9 @@ pack-goal:
 pack-lsp:
     just pack lsp
 
+pack-opencode-go-usage:
+    just pack opencode-go-usage
+
 pack-plan-mode:
     just pack plan-mode
 
@@ -151,6 +154,9 @@ try-goal:
 
 try-lsp:
     just try lsp
+
+try-opencode-go-usage:
+    just try opencode-go-usage
 
 try-plan-mode:
     just try plan-mode
@@ -204,6 +210,9 @@ install-goal:
 install-lsp:
     just install lsp
 
+install-opencode-go-usage:
+    just install opencode-go-usage
+
 install-plan-mode:
     just install plan-mode
 
@@ -255,6 +264,9 @@ publish-goal:
 
 publish-lsp:
     just publish lsp
+
+publish-opencode-go-usage:
+    just publish opencode-go-usage
 
 publish-plan-mode:
     just publish plan-mode

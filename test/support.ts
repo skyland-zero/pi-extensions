@@ -24,6 +24,7 @@ type MockPiApi = {
 	registerFlag(name: string, flag: unknown): void;
 	registerTool(tool: unknown): void;
 	registerShortcut(shortcut: string, options: unknown): void;
+	registerEntryRenderer(customType: string, renderer: unknown): void;
 	on(name: string, handler: MockHandler): void;
 	getFlag(name: string): unknown;
 	getActiveTools(): string[];
@@ -59,6 +60,9 @@ export function createMockPi(options: { activeTools?: string[]; allTools?: unkno
 			tools.push(tool as MockTool);
 		},
 		registerShortcut(_shortcut: string, _options: unknown) {
+			// no-op in tests
+		},
+		registerEntryRenderer(_customType: string, _renderer: unknown) {
 			// no-op in tests
 		},
 		on(name: string, handler: MockHandler) {
@@ -147,6 +151,7 @@ export function createMockContext(overrides: Record<string, unknown> = {}) {
 		},
 		modelRegistry: overrides.modelRegistry ?? {
 			getApiKeyAndHeaders: async () => ({ ok: false, error: "missing" }),
+			getApiKeyForProvider: async () => undefined,
 			getAvailable: () => [],
 			getAll: () => [],
 		},

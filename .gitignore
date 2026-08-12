@@ -201,9 +201,9 @@ vite.config.ts.timestamp-*
 .vite/
 
 # Project
-src/
-src.zip
-third_party/
+/src/
+/src.zip
+/third_party/
 extensions/archived/
 
 # Runtime
