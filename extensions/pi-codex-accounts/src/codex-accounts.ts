@@ -1,17 +1,16 @@
 import { join } from "node:path";
 import {
-	FileAuthStorageBackend,
 	getAgentDir,
-	type AuthStorageBackend,
 	type ExtensionAPI,
 	type ExtensionCommandContext,
 	type ExtensionContext,
 } from "@earendil-works/pi-coding-agent";
+import { type OAuthCredentials, type OAuthLoginCallbacks } from "@earendil-works/pi-ai/oauth";
 import {
+	FileAuthStorageBackend,
 	openaiCodexOAuthProvider,
-	type OAuthCredentials,
-	type OAuthLoginCallbacks,
-} from "@earendil-works/pi-ai/oauth";
+	type AuthStorageBackend,
+} from "./codex-oauth.js";
 
 export const CODEX_PROVIDER_ID = "openai-codex";
 export const DEFAULT_CODEX_MODEL_ID = "gpt-5.5";

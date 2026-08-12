@@ -75,6 +75,7 @@ export const BTW_THINKING_LEVELS = [
 	"medium",
 	"high",
 	"xhigh",
+	"max",
 ] as const;
 
 export type BtwThinkingLevel = (typeof BTW_THINKING_LEVELS)[number];
@@ -95,7 +96,7 @@ interface LoadBtwThinkingLevelOptions {
 
 interface SideQuestionAuth {
 	apiKey: string;
-	headers?: Record<string, string>;
+	headers?: Record<string, string | null>;
 	env?: Record<string, string>;
 }
 

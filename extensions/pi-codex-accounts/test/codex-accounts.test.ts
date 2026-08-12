@@ -3,10 +3,6 @@ import { mkdtemp, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import {
-	FileAuthStorageBackend,
-	InMemoryAuthStorageBackend,
-} from "@earendil-works/pi-coding-agent";
 import { createMockContext, createMockPi } from "../../../test/support.js";
 import codexAccounts, {
 	CODEX_ACCOUNTS_STATUS_KEY,
@@ -20,6 +16,7 @@ import codexAccounts, {
 	isOpenAICodexModel,
 	parseAccountName,
 } from "../src/codex-accounts.js";
+import { FileAuthStorageBackend, InMemoryAuthStorageBackend } from "../src/codex-oauth.js";
 
 const validCred = (suffix = "") => ({
 	access: `access-${suffix}`,
