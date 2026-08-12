@@ -26,6 +26,7 @@
 		"pack:google-genai": "npm --workspace @narumitw/pi-google-genai pack --dry-run",
 		"pack:goal": "npm --workspace @narumitw/pi-goal pack --dry-run",
 		"pack:lsp": "npm --workspace @narumitw/pi-lsp pack --dry-run",
+		"pack:opencode-go-usage": "npm --workspace @narumitw/pi-opencode-go-usage pack --dry-run",
 		"pack:plan-mode": "npm --workspace @narumitw/pi-plan-mode pack --dry-run",
 		"pack:plan-oc": "npm --workspace @skylandzero/pi-plan-oc pack --dry-run",
 		"pack:retry": "npm --workspace @narumitw/pi-retry pack --dry-run",
@@ -36,7 +37,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.5.2",
-		"@earendil-works/pi-coding-agent": "0.80.3",
+		"@earendil-works/pi-coding-agent": "0.84.1",
 		"@types/node": "^26.1.0",
 		"typebox": "^1.3.3",
 		"typescript": "^6.0.3"
